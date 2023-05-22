@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
         moladWindows.classList.remove('show');
         document.body.style.overflow = '';
     }
-    // open modal 
+    // ---- open modal 
     const addModalTimer = setTimeout(openModal, 60_000);
 
 
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // Menu Card
+    // ---- Menu Card
 
     class MenuCard {
         constructor(src, alter, title, descr, price, parentSelector, ...classes) {
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
    
 
-    // Forms 
+    // ---- Forms 
 
     const forms = document.querySelectorAll('form');
 
@@ -299,4 +299,127 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 4000);
     }
 
+    // ----- Slide
+    const slidesImg = document.querySelectorAll('.offer__slide'),
+          slider = document.querySelector('.offer__slider'),
+          prev = document.querySelector('.offer__slider-prev'),
+          next = document.querySelector('.offer__slider-next'),
+          current = document.querySelector('#current'),
+          total = document.querySelector('#total'),
+          sliderWrapper = document.querySelector('.offer__slider-wrapper'),
+          slidesField = document.querySelector('.offer__slider-inner'),
+          width = window.getComputedStyle(sliderWrapper).width; // 650 px
+          let whidthImg = Math.round(parseFloat(width)) + 'px';
+    let index = 1; 
+    let offset = 0;
+    
+
+    if(slidesImg.length < 10){
+        total.textContent = `0${slidesImg.length}`;
+        current.textContent = `0${index}`;
+    }else{
+        total.textContent = slidesImg.length;
+        current.textContent = index;
+    }
+
+    function calcWhidth(w){
+        return +w.replace(/\D/g, '');
+    };
+
+    slidesImg.forEach(slide =>{
+        slide.style.width = whidthImg;
+    });
+    slider.style.position = 'relative';
+    let indicators = document.createElement('ol'),
+        dots = [];
+    indicators.classList.add('carousel-indicators');
+    slider.append(indicators);
+
+    for(let i = 0; i < slidesImg.length; i++){
+        const dot = document.createElement('li');
+        dot.setAttribute('data-slide-to', i +1);
+        dot.classList.add('dot');
+        
+        if(i == 0){
+            dot.style.opacity = 1;
+        }
+        indicators.append(dot);
+        dots.push(dot);
+    }
+    console.log(dots);
+
+    slidesField.style.transition = '.5s all'
+    slidesField.style.display = 'flex';
+    slidesField.style.width = slidesImg.length * 100 + '%';
+    sliderWrapper.style.overflow = 'hidden';
+
+    function plusNext(){
+        if(index == slidesImg.length){
+            index = 1;
+        }else{
+            index++;
+        };
+        if(slidesImg.length < 10){
+            current.textContent = `0${index}`;
+        }else{
+            index;
+        }
+    };
+
+    function minusPrev(){
+        if(index == 1){
+            index = slidesImg.length;
+        }else{
+            index--;
+        }
+        if(slidesImg.length < 10){
+            current.textContent = `0${index}`;
+        }else{
+            index;
+        }
+    };
+
+    
+    
+    next.addEventListener('click', ()=>{
+        if(offset == calcWhidth(whidthImg) * (slidesImg.length - 1)){
+            offset = 0;
+        }else{
+            offset += calcWhidth(whidthImg);
+        };
+        slidesField.style.transform = `translateX(-${offset}px)`;
+        plusNext();
+
+        dots.forEach(dot => dot.style.opacity = '.5');
+        dots[index - 1].style.opacity = 1;
+         });
+
+    prev.addEventListener('click', ()=>{
+        if(offset == 0){
+            offset = calcWhidth(whidthImg) * (slidesImg.length - 1);
+        }else{
+            offset -= calcWhidth(whidthImg);
+        };
+
+        slidesField.style.transform = `translateX(-${offset}px)`;
+        minusPrev();
+        dots.forEach(dot => dot.style.opacity = '.5');
+        dots[index - 1].style.opacity = 1;
+    });
+    dots.forEach( dot =>{
+
+        dot.addEventListener('click', (e)=>{
+            const slideTo = e.target.getAttribute('data-slide-to');
+            index = slideTo;
+            offset = calcWhidth(whidthImg) * (slideTo - 1);
+            slidesField.style.transform = `translateX(-${offset}px)`;
+            dots.forEach(dot => dot.style.opacity = '.5');
+            if(slidesImg.length < 10){
+                current.textContent = `0${index}`;
+            }else{
+                index;
+            }
+        dots[index - 1].style.opacity = 1;
+        });
+    })
 });
